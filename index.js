@@ -13,7 +13,7 @@ var mysqlConnection = mysql.createConnection({
     host: 'localhost',
     user: 'root',
     password: '',
-    database: 'crud_api',
+    database: 'rainbow',
     multipleStatements: true
 
 });
@@ -31,20 +31,31 @@ app.listen('3000', () => {
     console.log('Express Running on Port 3000');
 });
 
-app.post('/worker', (req, res) => {
-    mysqlConnection.query('INSERT INTO  workers(person, age) VALUES(?,?)', [req.body.person, req.body.age], (err, response) => {
-        if (!err) {
-            res.send('Worker Entered');
+app.post('/user', (req, res) => {
 
-        } else {
-            throw err;
+    mysqlConnection.query('SELECT username FROM users WHERE username=?', [req.body.username], (err, results) => {
+        if (err) {
+            console.log(err);
+            res.send(err);
         }
+        if (results.length > 0) {
+            res.send('Username already Exists');
+        }
+        mysqlConnection.query('INSERT INTO  users(person, username, age, position) VALUES(?,?,?,?)', [req.body.person, req.body.username, req.body.age, req.body.position], (err, response) => {
+            if (!err) {
+                res.send('User Entered Successfully');
+
+            } else {
+                throw err;
+            }
+        });
     });
+
 
 });
 
-app.get('/workers', (req, res) => {
-    mysqlConnection.query('SELECT * FROM workers', (err, rows, fields) => {
+app.get('/users', (req, res) => {
+    mysqlConnection.query('SELECT * FROM users', (err, rows, fields) => {
         if (!err) {
             res.send(rows);
         } else {
@@ -54,8 +65,8 @@ app.get('/workers', (req, res) => {
 
 })
 
-app.get('/worker/:id', (req, res) => {
-    mysqlConnection.query('SELECT * FROM workers WHERE id=?', [req.params.id], (err, response) => {
+app.get('/user/:id', (req, res) => {
+    mysqlConnection.query('SELECT * FROM users WHERE id=?', [req.params.id], (err, response) => {
         if (!err) {
             res.send(response);
         } else {
@@ -65,8 +76,8 @@ app.get('/worker/:id', (req, res) => {
 
 });
 
-app.delete('/worker/:id', (req, res) => {
-    mysqlConnection.query('DELETE FROM workers WHERE id=?', [req.params.id], (err, response) => {
+app.delete('/user/:id', (req, res) => {
+    mysqlConnection.query('DELETE FROM users WHERE id=?', [req.params.id], (err, response) => {
         if (!err) {
             res.send(`${req.params.id} Deleted SUccessfully`);
         } else {
@@ -75,8 +86,8 @@ app.delete('/worker/:id', (req, res) => {
     });
 });
 
-app.put('/worker/:id', (req, res) => {
-    mysqlConnection.query('UPDATE workers SET ? WHERE id=?', [req.body, req.params.id], (err, rows, fields) => {
+app.put('/user/:id', (req, res) => {
+    mysqlConnection.query('UPDATE users SET ? WHERE id=?', [req.body, req.params.id], (err, rows, fields) => {
         if (!err) {
             res.send('Updated Successfully');
         } else {
@@ -84,3 +95,5 @@ app.put('/worker/:id', (req, res) => {
         }
     })
 })
+
+app.post('/login', (req, res) => {})
